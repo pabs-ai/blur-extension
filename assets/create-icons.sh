@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# Create simple SVG-based placeholder icons for testing
+
+# Create 128x128 icon
+cat > icon-128.svg << 'SVGEOF'
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <rect width="128" height="128" rx="24" fill="#10b981"/>
+  <path d="M64 44C48 44 34 52 24 64c10 12 24 20 40 20s30-8 40-20c-10-12-24-20-40-20z" 
+        fill="none" stroke="white" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="64" cy="64" r="12" fill="white"/>
+</svg>
+SVGEOF
+
+# Create active state icon
+cat > icon-active-128.svg << 'SVGEOF'
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <rect width="128" height="128" rx="24" fill="#059669"/>
+  <circle cx="104" cy="24" r="16" fill="#34d399"/>
+  <path d="M64 44C48 44 34 52 24 64c10 12 24 20 40 20s30-8 40-20c-10-12-24-20-40-20z" 
+        fill="none" stroke="white" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="64" cy="64" r="12" fill="white"/>
+</svg>
+SVGEOF
+
+echo "SVG icons created successfully"

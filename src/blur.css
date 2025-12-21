@@ -1,0 +1,136 @@
+/* Blur Protection Styles */
+
+.blur-protected {
+  position: relative;
+  transition: filter 0.3s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+}
+
+.blur-protection-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+/* Indicator Styles */
+.blur-indicator {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 999999;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  pointer-events: none;
+  animation: slideInRight 0.3s ease;
+}
+
+.blur-indicator.hidden {
+  display: none;
+}
+
+.blur-indicator-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.blur-indicator-content svg {
+  flex-shrink: 0;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Pulse animation for active blurring */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.blur-indicator.active {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .blur-protected {
+    background-color: #000 !important;
+    color: transparent !important;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .blur-protected,
+  .blur-indicator {
+    transition: none;
+    animation: none;
+  }
+}
+
+/* Dark mode support for indicator */
+@media (prefers-color-scheme: dark) {
+  .blur-indicator {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* Ensure blur is visible in screenshots/screen shares */
+.blur-protected::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(128, 128, 128, 0.1);
+  pointer-events: none;
+}
+
+/* Different blur intensities */
+.blur-protected[data-blur-intensity="low"] {
+  filter: blur(5px) !important;
+}
+
+.blur-protected[data-blur-intensity="medium"] {
+  filter: blur(10px) !important;
+}
+
+.blur-protected[data-blur-intensity="high"] {
+  filter: blur(20px) !important;
+}
+
+/* Pixelation effect alternative */
+.blur-protected.pixelate {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  filter: blur(8px) contrast(1.2);
+}
+
+/* Ensure text remains unselectable when blurred */
+.blur-protected * {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+}

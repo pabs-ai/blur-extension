@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blur Extension Test Page</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background: #f5f5f5;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    
+    header {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      padding: 40px;
+      border-radius: 12px;
+      margin-bottom: 40px;
+      text-align: center;
+    }
+    
+    h1 {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+    
+    .subtitle {
+      font-size: 16px;
+      opacity: 0.9;
+    }
+    
+    .test-section {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .test-section h2 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #10b981;
+      border-bottom: 2px solid #10b981;
+      padding-bottom: 10px;
+    }
+    
+    .test-item {
+      background: #f9fafb;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border-left: 4px solid #10b981;
+    }
+    
+    .test-item strong {
+      display: block;
+      margin-bottom: 5px;
+      color: #059669;
+    }
+    
+    .instructions {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .instructions h3 {
+      margin-bottom: 10px;
+      color: #856404;
+    }
+    
+    .instructions ol {
+      margin-left: 20px;
+    }
+    
+    .instructions li {
+      margin: 8px 0;
+    }
+    
+    code {
+      background: #e9ecef;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+    }
+    
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .badge-email {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+    
+    .badge-card {
+      background: #fce7f3;
+      color: #9f1239;
+    }
+    
+    .badge-api {
+      background: #fef3c7;
+      color: #92400e;
+    }
+    
+    .badge-money {
+      background: #d1fae5;
+      color: #065f46;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+    
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    
+    th {
+      background: #f9fafb;
+      font-weight: 600;
+      color: #374151;
+    }
+    
+    tr:hover {
+      background: #f9fafb;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🔒 Blur Extension Test Page</h1>
+      <p class="subtitle">This page contains various types of sensitive information to test the blur functionality</p>
+    </header>
+
+    <div class="instructions">
+      <h3>📋 Testing Instructions</h3>
+      <ol>
+        <li>Make sure the Blur extension is installed and enabled</li>
+        <li>Open Google Meet or Zoom in another tab/window</li>
+        <li>Start a screen share (share your entire screen or this browser window)</li>
+        <li>Return to this page - you should see sensitive data automatically blurred</li>
+        <li>Press <code>Ctrl+Shift+B</code> (or <code>Cmd+Shift+B</code> on Mac) to toggle blur on/off</li>
+        <li>Check that the green "Blur Protection Active" indicator appears in the top-right</li>
+      </ol>
+    </div>
+
+    <!-- Email Addresses -->
+    <div class="test-section">
+      <h2>📧 Email Addresses <span class="badge badge-email">Should Blur</span></h2>
+      
+      <div class="test-item">
+        <strong>Customer Contact:</strong>
+        <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="016b6e696f2f656e6441626e6c71606f782f626e6c">[email&#160;protected]</a>
+      </div>
+      
+      <div class="test-item">
+        <strong>Support Team:</strong>
+        Contact us at <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="493a3c3939263b3d093d2c2a212a263b39672026">[email&#160;protected]</a> or <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c8aaa1a4a4a1a6af88bcadaba0aba7bab8e6a1a7">[email&#160;protected]</a> for assistance.
+      </div>
+      
+      <div class="test-item">
+        <strong>Email List:</strong>
+        <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="70111c1913155e031d190418301508111d001c155e131f1d">[email&#160;protected]</a>, <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="75171a175b1f1a1b100635100d14180519105b1a0712">[email&#160;protected]</a>, <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="2e4d464f5c42474b004c5c4159406e5a4b5d5a004d4143">[email&#160;protected]</a>
+      </div>
+      
+      <div class="test-item">
+        <strong>Executive Team:</strong>
+        CEO: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="6c1f0d1e0d04421b05001f03022c1f180d1e18191c420f0301">[email&#160;protected]</a> | CTO: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="0165607768652f6269646f41727560737574712f626e6c">[email&#160;protected]</a> | CFO: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="dabfb7b3b6a3f4b8a8b5adb49aa9aebba8aeafaaf4b9b5b7">[email&#160;protected]</a>
+      </div>
+    </div>
+
+    <!-- Credit Card Numbers -->
+    <div class="test-section">
+      <h2>💳 Credit Card Numbers <span class="badge badge-card">Should Blur</span></h2>
+      
+      <div class="test-item">
+        <strong>Test Card 1:</strong>
+        4532-1234-5678-9010
+      </div>
+      
+      <div class="test-item">
+        <strong>Test Card 2:</strong>
+        4111 1111 1111 1111
+      </div>
+      
+      <div class="test-item">
+        <strong>Test Card 3 (no spaces):</strong>
+        5555555555554444
+      </div>
+      
+      <div class="test-item">
+        <strong>Customer Payment:</strong>
+        Last 4 digits: 9876 | Full: 4916-7392-8465-9876
+      </div>
+    </div>
+
+    <!-- API Keys and Tokens -->
+    <div class="test-section">
+      <h2>🔑 API Keys & Tokens <span class="badge badge-api">Should Blur</span></h2>
+      
+      <div class="test-item">
+        <strong>Stripe Live Key:</strong>
+        sk_live_51HqJxKLkjsdfkljsdflkjsdf8932lkjsdf
+      </div>
+      
+      <div class="test-item">
+        <strong>Stripe Public Key:</strong>
+        pk_live_51HqJxKLkjsdfkljsdflkjsdf8932lkjsdf
+      </div>
+      
+      <div class="test-item">
+        <strong>Generic API Token:</strong>
+        a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6
+      </div>
+      
+      <div class="test-item">
+        <strong>OAuth Token:</strong>
+        Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ
+      </div>
+    </div>
+
+    <!-- Financial Data -->
+    <div class="test-section">
+      <h2>💰 Financial Data & Revenue <span class="badge badge-money">Should Blur</span></h2>
+      
+      <div class="test-item">
+        <strong>Monthly Revenue:</strong>
+        $127,845.50
+      </div>
+      
+      <div class="test-item">
+        <strong>Annual Sales:</strong>
+        Total revenue: $1,534,234.00 USD
+      </div>
+      
+      <div class="test-item">
+        <strong>Transaction Amount:</strong>
+        Payment of $5,432.50 received from client
+      </div>
+      
+      <div class="test-item">
+        <strong>Budget:</strong>
+        Q4 budget allocation: $250,000 USD | Remaining: $187,500
+      </div>
+    </div>
+
+    <!-- Account Numbers -->
+    <div class="test-section">
+      <h2>🏦 Account Numbers <span class="badge badge-api">Should Blur</span></h2>
+      
+      <div class="test-item">
+        <strong>Customer Account:</strong>
+        acct_1HqJxKLkjsdfkljsdflkj
+      </div>
+      
+      <div class="test-item">
+        <strong>Bank Account:</strong>
+        Account Number: 123456789 | Routing: 021000021
+      </div>
+      
+      <div class="test-item">
+        <strong>Salesforce Account:</strong>
+        account_001t000001TzA1ZAAV
+      </div>
+    </div>
+
+    <!-- PII (Social Security, Phone) -->
+    <div class="test-section">
+      <h2>🔐 Personal Information (PII) <span class="badge badge-email">Should Blur</span></h2>
+      
+      <div class="test-item">
+        <strong>SSN:</strong>
+        123-45-6789
+      </div>
+      
+      <div class="test-item">
+        <strong>Phone Numbers:</strong>
+        (555) 123-4567 | +1-555-987-6543 | 555.246.8135
+      </div>
+      
+      <div class="test-item">
+        <strong>Customer Details:</strong>
+        Name: Jane Smith | SSN: 987-65-4321 | Phone: (555) 444-3333
+      </div>
+    </div>
+
+    <!-- Customer Data Table -->
+    <div class="test-section">
+      <h2>📊 Customer Database Example</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Customer ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Revenue</th>
+            <th>Payment Method</th>
+            <th>Account ID</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>CUST-001</td>
+            <td>Alice Johnson</td>
+            <td><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="02636e6b61672c686d6a6c716d6c427667616a616d70722c616d6f">[email&#160;protected]</a></td>
+            <td>$45,230.00</td>
+            <td>**** 4532</td>
+            <td>acct_1A2B3C4D5E6F</td>
+          </tr>
+          <tr>
+            <td>CUST-002</td>
+            <td>Bob Williams</td>
+            <td><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="2d4f424f035a444141444c405e6d5e594c5f59585d034442">[email&#160;protected]</a></td>
+            <td>$78,900.50</td>
+            <td>**** 1111</td>
+            <td>acct_9Z8Y7X6W5V4U</td>
+          </tr>
+          <tr>
+            <td>CUST-003</td>
+            <td>Carol Martinez</td>
+            <td><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="56353724393a783b163423253f383325257835393b">[email&#160;protected]</a></td>
+            <td>$123,456.75</td>
+            <td>**** 5555</td>
+            <td>acct_3T4R5E6W7Q8P</td>
+          </tr>
+          <tr>
+            <td>CUST-004</td>
+            <td>David Lee</td>
+            <td><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="0b6f6a7d626f25676e6e4b6e657f6e797b7962786e2564796c">[email&#160;protected]</a></td>
+            <td>$234,567.00</td>
+            <td>**** 9876</td>
+            <td>acct_7M8N9O0P1Q2R</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Mixed Content -->
+    <div class="test-section">
+      <h2>🔀 Mixed Sensitive Content</h2>
+      
+      <div class="test-item">
+        <strong>Support Ticket:</strong>
+        Cus

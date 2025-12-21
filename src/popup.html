@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blur Settings</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <!-- Header -->
+    <div class="popup-header">
+      <div class="header-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M12 3C7.5 3 3.5 6.5 2 12c1.5 5.5 5.5 9 10 9s8.5-3.5 10-9c-1.5-5.5-5.5-9-10-9z" stroke="currentColor" stroke-width="2"/>
+          <circle cx="12" cy="12" r="3.5" fill="currentColor"/>
+        </svg>
+      </div>
+      <div class="header-text">
+        <h1>Blur Protection</h1>
+        <p class="status-text" id="status">Ready</p>
+      </div>
+    </div>
+
+    <!-- Quick Toggle -->
+    <div class="section">
+      <div class="toggle-row">
+        <div>
+          <h3>Enable Protection</h3>
+          <p class="description">Automatically blur sensitive data during screen sharing</p>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="toggle-blur" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Screen Share Status -->
+    <div class="section status-section" id="sharing-status">
+      <div class="status-badge">
+        <div class="status-dot"></div>
+        <span>Not sharing screen</span>
+      </div>
+    </div>
+
+    <!-- Settings -->
+    <div class="section">
+      <h3>Blur Intensity</h3>
+      <div class="slider-container">
+        <input type="range" id="blur-intensity" min="5" max="20" value="10" step="1">
+        <div class="slider-labels">
+          <span>Low</span>
+          <span id="intensity-value">10px</span>
+          <span>High</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Data Types -->
+    <div class="section">
+      <h3>Data Types to Blur</h3>
+      <div class="checkbox-group">
+        <label class="checkbox-label">
+          <input type="checkbox" id="blur-email" checked>
+          <span>Email Addresses</span>
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" id="blur-credit-card" checked>
+          <span>Credit Card Numbers</span>
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" id="blur-api-keys" checked>
+          <span>API Keys & Tokens</span>
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" id="blur-revenue" checked>
+          <span>Revenue & Financial Data</span>
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" id="blur-account-numbers" checked>
+          <span>Account Numbers</span>
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" id="blur-pii" checked>
+          <span>Personal Information (PII)</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Active Sites -->
+    <div class="section">
+      <h3>Protected Sites</h3>
+      <div class="sites-list">
+        <div class="site-item">
+          <span class="site-icon-placeholder">📧</span>
+          <span>Gmail</span>
+          <span class="badge">Active</span>
+        </div>
+        <div class="site-item">
+          <span class="site-icon-placeholder">💳</span>
+          <span>Stripe</span>
+          <span class="badge">Active</span>
+        </div>
+        <div class="site-item">
+          <span class="site-icon-placeholder">☁️</span>
+          <span>Salesforce</span>
+          <span class="badge">Active</span>
+        </div>
+      </div>
+      <button class="secondary-button" id="add-site">+ Add Custom Site</button>
+    </div>
+
+    <!-- Options -->
+    <div class="section">
+      <label class="checkbox-label">
+        <input type="checkbox" id="auto-enable" checked>
+        <span>Auto-enable when screen sharing starts</span>
+      </label>
+      <label class="checkbox-label">
+        <input type="checkbox" id="show-indicator" checked>
+        <span>Show on-screen indicator when active</span>
+      </label>
+    </div>
+
+    <!-- Footer -->
+    <div class="popup-footer">
+      <button class="secondary-button" id="open-settings">Advanced Settings</button>
+      <div class="keyboard-hint">
+        <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>B</kbd> to toggle
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
