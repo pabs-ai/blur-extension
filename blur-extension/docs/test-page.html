@@ -166,13 +166,63 @@
       <h3>📋 Testing Instructions</h3>
       <ol>
         <li>Make sure the Blur extension is installed and enabled</li>
-        <li>Open Google Meet or Zoom in another tab/window</li>
-        <li>Start a screen share (share your entire screen or this browser window)</li>
-        <li>Return to this page - you should see sensitive data automatically blurred</li>
+        <li>Click the green button below to start screen sharing</li>
+        <li>Select "This Tab" or "Entire Screen" in the dialog</li>
+        <li>Sensitive data on this page should automatically blur</li>
         <li>Press <code>Ctrl+Shift+B</code> (or <code>Cmd+Shift+B</code> on Mac) to toggle blur on/off</li>
-        <li>Check that the green "Blur Protection Active" indicator appears in the top-right</li>
+        <li>Click "Stop Sharing" to end the test</li>
       </ol>
+
+      <div style="text-align: center; margin-top: 20px;">
+        <button id="startShareBtn" style="background: #10b981; color: white; border: none; padding: 15px 30px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: 600;">
+          🎥 Start Screen Share
+        </button>
+        <button id="stopShareBtn" style="background: #dc2626; color: white; border: none; padding: 15px 30px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: 600; display: none; margin-left: 10px;">
+          ⏹️ Stop Sharing
+        </button>
+        <p id="shareStatus" style="margin-top: 10px; font-weight: 600; color: #059669;"></p>
+      </div>
     </div>
+
+    <script>
+      let currentStream = null;
+
+      document.getElementById('startShareBtn').addEventListener('click', async () => {
+        try {
+          currentStream = await navigator.mediaDevices.getDisplayMedia({
+            video: true,
+            audio: false
+          });
+
+          document.getElementById('startShareBtn').style.display = 'none';
+          document.getElementById('stopShareBtn').style.display = 'inline-block';
+          document.getElementById('shareStatus').textContent = '✅ Screen sharing active - data should be blurred';
+
+          // Monitor for when sharing stops
+          currentStream.getVideoTracks().forEach(track => {
+            track.onended = () => {
+              stopSharing();
+            };
+          });
+        } catch (error) {
+          alert('Screen share cancelled or failed: ' + error.message);
+        }
+      });
+
+      document.getElementById('stopShareBtn').addEventListener('click', () => {
+        stopSharing();
+      });
+
+      function stopSharing() {
+        if (currentStream) {
+          currentStream.getTracks().forEach(track => track.stop());
+          currentStream = null;
+        }
+        document.getElementById('startShareBtn').style.display = 'inline-block';
+        document.getElementById('stopShareBtn').style.display = 'none';
+        document.getElementById('shareStatus').textContent = '';
+      }
+    </script>
 
     <!-- Email Addresses -->
     <div class="test-section">
