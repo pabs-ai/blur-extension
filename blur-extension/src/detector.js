@@ -50,19 +50,24 @@ class ScreenShareDetector {
   }
 
   hookGetDisplayMedia() {
-    // Hook into the getDisplayMedia API to detect screen sharing
-    const originalGetDisplayMedia = navigator.mediaDevices.getDisplayMedia;
+    // Store original if not already stored
+    if (!this.originalGetDisplayMedia) {
+      this.originalGetDisplayMedia = navigator.mediaDevices.getDisplayMedia.bind(navigator.mediaDevices);
+      console.log('Blur: Stored original getDisplayMedia');
+    }
+
     const detector = this;
 
+    // Replace with our hooked version
     navigator.mediaDevices.getDisplayMedia = async function(...args) {
-      console.log('Blur: getDisplayMedia called');
-      
+      console.log('Blur: getDisplayMedia called - hook working!');
+
       try {
-        const stream = await originalGetDisplayMedia.apply(this, args);
-        
+        const stream = await detector.originalGetDisplayMedia(...args);
+
         // Screen sharing started
         detector.handleScreenShareStart(stream);
-        
+
         // Monitor for when it stops
         stream.getVideoTracks().forEach(track => {
           track.onended = () => {
@@ -70,13 +75,18 @@ class ScreenShareDetector {
             detector.handleScreenShareStop();
           };
         });
-        
+
         return stream;
       } catch (error) {
         console.log('Blur: getDisplayMedia cancelled or failed', error);
         throw error;
       }
     };
+
+    console.log('Blur: Hook applied to getDisplayMedia');
+
+    // Re-apply hook every 2 seconds in case page overwrites it
+    setTimeout(() => this.hookGetDisplayMedia(), 2000);
   }
 
   monitorGoogleMeet() {
