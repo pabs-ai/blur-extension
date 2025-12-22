@@ -280,23 +280,22 @@ class SensitiveDataBlurrer {
 
   containsSensitiveData(text, dataTypes) {
     if (!text || text.length < 3) return false;
-    
+
     const patterns = {
       email: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/,
       creditCard: /\b(?:\d{4}[-\s]?){3}\d{4}\b/,
-      apiKey: /\b[A-Za-z0-9]{32,}\b|sk_live_[A-Za-z0-9]+|pk_live_[A-Za-z0-9]+/,
-      accountNumber: /\b(?:acct_|account[_-]?)\w+\b/i,
+      apiKeys: /\b[A-Za-z0-9]{32,}\b|sk_live_[A-Za-z0-9]+|pk_live_[A-Za-z0-9]+/,
+      accountNumbers: /\b(?:acct_|account[_-]?)\w+\b/i,
       revenue: /\$[\d,]+(?:\.\d{2})?|\d+(?:,\d{3})*(?:\.\d{2})?\s*(?:USD|EUR|GBP)/,
-      ssn: /\b\d{3}-\d{2}-\d{4}\b/,
-      phone: /\b(?:\+1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/
+      pii: /\b\d{3}-\d{2}-\d{4}\b|\b(?:\+1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/
     };
-    
+
     for (const [type, pattern] of Object.entries(patterns)) {
-      if (dataTypes[type] !== false && pattern.test(text)) {
+      if (dataTypes[type] === true && pattern.test(text)) {
         return true;
       }
     }
-    
+
     return false;
   }
 
