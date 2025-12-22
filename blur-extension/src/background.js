@@ -165,17 +165,10 @@ class BlurExtension {
   }
 
   async notifyContentScripts() {
-    // Get all tabs with content scripts
-    const tabs = await chrome.tabs.query({
-      url: [
-        'https://mail.google.com/*',
-        'https://dashboard.stripe.com/*',
-        'https://*.salesforce.com/*',
-        'https://*.lightning.force.com/*'
-      ]
-    });
+    // Get all tabs (we'll try to message all of them, content scripts will respond if present)
+    const tabs = await chrome.tabs.query({});
 
-    // Send state update to all content scripts
+    // Send state update to all tabs
     for (const tab of tabs) {
       try {
         await chrome.tabs.sendMessage(tab.id, {
@@ -185,7 +178,7 @@ class BlurExtension {
           settings: this.settings
         });
       } catch (error) {
-        console.log('Could not send message to tab:', tab.id, error);
+        // Ignore errors - tab might not have content script
       }
     }
   }
