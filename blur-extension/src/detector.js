@@ -4,6 +4,8 @@ class ScreenShareDetector {
   constructor() {
     this.isSharing = false;
     this.checkInterval = null;
+    this.stateChangeTimer = null;
+    this.pendingState = null;
     this.init();
   }
 
@@ -182,10 +184,31 @@ class ScreenShareDetector {
       return document.querySelector(selector) !== null;
     });
 
-    if (hasIndicator && !this.isSharing) {
-      this.handleScreenShareStart();
-    } else if (!hasIndicator && this.isSharing) {
-      this.handleScreenShareStop();
+    const newState = hasIndicator;
+
+    // Debounce state changes to prevent flickering
+    if (newState !== this.isSharing) {
+      if (this.pendingState === newState) {
+        // Same pending state, no need to reset timer
+        return;
+      }
+
+      // Clear existing timer
+      if (this.stateChangeTimer) {
+        clearTimeout(this.stateChangeTimer);
+      }
+
+      this.pendingState = newState;
+
+      // Wait 3 seconds before actually changing state
+      this.stateChangeTimer = setTimeout(() => {
+        if (newState && !this.isSharing) {
+          this.handleScreenShareStart();
+        } else if (!newState && this.isSharing) {
+          this.handleScreenShareStop();
+        }
+        this.pendingState = null;
+      }, 3000);
     }
   }
 
