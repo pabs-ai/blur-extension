@@ -246,19 +246,23 @@ class PopupController {
       </div>
     `).join('');
 
-    // Add event listeners
-    container.querySelectorAll('.test-pattern').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const index = parseInt(e.target.dataset.index);
-        this.testPattern(patterns[index]);
-      });
-    });
+    // Add event listeners using event delegation
+    container.addEventListener('click', (e) => {
+      const button = e.target.closest('.pattern-btn');
+      if (!button) {
+        return;
+      }
 
-    container.querySelectorAll('.delete').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const index = parseInt(e.target.dataset.index);
+      const index = parseInt(button.dataset.index, 10);
+      if (isNaN(index)) {
+        return;
+      }
+
+      if (button.classList.contains('test-pattern')) {
+        this.testPattern(patterns[index]);
+      } else if (button.classList.contains('delete')) {
         this.deletePattern(index);
-      });
+      }
     });
   }
 
@@ -323,8 +327,7 @@ class PopupController {
       return;
     }
 
-    const customPatterns = this.state.settings.customPatterns || [];
-    customPatterns.splice(index, 1);
+    const customPatterns = (this.state.settings.customPatterns || []).filter((_, i) => i !== index);
 
     await this.updateSetting('customPatterns', customPatterns);
     this.renderCustomPatterns();

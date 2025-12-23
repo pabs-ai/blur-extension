@@ -299,8 +299,8 @@ class SensitiveDataBlurrer {
     }
 
     // Check custom patterns
-    if (this.settings.customPatterns && this.settings.customPatterns.length > 0) {
-      for (const customPattern of this.settings.customPatterns) {
+    if (this.state.settings.customPatterns && this.state.settings.customPatterns.length > 0) {
+      for (const customPattern of this.state.settings.customPatterns) {
         if (customPattern.enabled !== false) {
           try {
             const regex = new RegExp(customPattern.regex);
