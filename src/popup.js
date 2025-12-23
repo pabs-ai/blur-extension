@@ -117,9 +117,22 @@ class PopupController {
     document.getElementById('add-site').addEventListener('click', () => {
       this.addCustomSite();
     });
-    
+
     document.getElementById('open-settings').addEventListener('click', () => {
       chrome.runtime.openOptionsPage();
+    });
+
+    // Export/Import
+    document.getElementById('export-settings').addEventListener('click', () => {
+      this.exportSettings();
+    });
+
+    document.getElementById('import-settings').addEventListener('click', () => {
+      document.getElementById('import-file').click();
+    });
+
+    document.getElementById('import-file').addEventListener('change', (e) => {
+      this.importSettings(e.target.files[0]);
     });
   }
 
@@ -213,6 +226,92 @@ class PopupController {
       return true;
     } catch {
       return false;
+    }
+  }
+
+  exportSettings() {
+    try {
+      // Create export data
+      const exportData = {
+        version: '1.0',
+        exportedAt: new Date().toISOString(),
+        settings: this.state.settings
+      };
+
+      // Convert to JSON
+      const jsonString = JSON.stringify(exportData, null, 2);
+      const blob = new Blob([jsonString], { type: 'application/json' });
+
+      // Create download link
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `blur-settings-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      // Update status
+      const statusText = document.getElementById('status');
+      const originalText = statusText.textContent;
+      statusText.textContent = 'Settings exported!';
+      setTimeout(() => {
+        statusText.textContent = originalText;
+      }, 2000);
+    } catch (error) {
+      console.error('Export failed:', error);
+      alert('Failed to export settings. Please try again.');
+    }
+  }
+
+  async importSettings(file) {
+    if (!file) {
+      return;
+    }
+
+    try {
+      const text = await file.text();
+      const importData = JSON.parse(text);
+
+      // Validate import data
+      if (!importData.version || !importData.settings) {
+        throw new Error('Invalid settings file format');
+      }
+
+      // Validate settings structure
+      const requiredFields = ['blurEnabled', 'blurIntensity', 'dataTypes', 'autoEnable', 'showIndicator'];
+      for (const field of requiredFields) {
+        if (!(field in importData.settings)) {
+          throw new Error(`Missing required field: ${field}`);
+        }
+      }
+
+      // Update settings
+      await chrome.runtime.sendMessage({
+        type: 'UPDATE_SETTINGS',
+        settings: importData.settings
+      });
+
+      this.state.settings = importData.settings;
+
+      // Update UI
+      this.setupUI();
+
+      // Update status
+      const statusText = document.getElementById('status');
+      const originalText = statusText.textContent;
+      statusText.textContent = 'Settings imported!';
+      setTimeout(() => {
+        statusText.textContent = originalText;
+      }, 2000);
+
+      // Clear file input
+      document.getElementById('import-file').value = '';
+    } catch (error) {
+      console.error('Import failed:', error);
+      alert(`Failed to import settings: ${error.message}`);
+      document.getElementById('import-file').value = '';
     }
   }
 }
