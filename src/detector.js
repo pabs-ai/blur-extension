@@ -7,6 +7,7 @@ class ScreenShareDetector {
     this.stateChangeTimer = null;
     this.pendingState = null;
     this.lastStateChange = null; // Track when last state change occurred
+    this.hookDetectedScreenShare = false; // Track if hook has ever detected screen share
     this.init();
   }
 
@@ -36,16 +37,18 @@ class ScreenShareDetector {
   }
 
   startMonitoring() {
-    // Hook into getDisplayMedia API - this is the most reliable method
+    // Hook into getDisplayMedia API - this is the PRIMARY and most reliable method
     this.hookGetDisplayMedia();
 
-    // ENABLE DOM-based detection WITH debouncing - the 3-second debounce prevents flickering
-    // This provides a fallback when the hook doesn't catch the screen share
+    // DOM-based detection as FALLBACK ONLY - stops once hook detects anything
+    // Check every 5 seconds, but only if hook hasn't detected screen share yet
     this.checkInterval = setInterval(() => {
-      this.checkDOMForIndicators();
-    }, 2000);  // Check every 2 seconds, state changes are debounced by 3 seconds
+      if (!this.hookDetectedScreenShare) {
+        this.checkDOMForIndicators();
+      }
+    }, 5000);  // Check every 5 seconds (less frequent to reduce flicker risk)
 
-    console.log('Blur: Using getDisplayMedia hook + debounced DOM detection (3s delay to prevent flickering)');
+    console.log('Blur: Using getDisplayMedia hook (primary) + DOM fallback (disabled after hook detects)');
   }
 
   hookGetDisplayMedia() {
@@ -166,10 +169,15 @@ class ScreenShareDetector {
   }
 
   checkDOMForIndicators() {
-    // Prevent state changes if one happened recently (lock for 10 seconds)
+    // Don't run if hook has already detected screen share - prevents flicker
+    if (this.hookDetectedScreenShare) {
+      return;
+    }
+
+    // Prevent state changes if one happened recently (lock for 15 seconds)
     const now = Date.now();
-    if (this.lastStateChange && (now - this.lastStateChange < 10000)) {
-      return; // Don't check again for 10 seconds after a state change
+    if (this.lastStateChange && (now - this.lastStateChange < 15000)) {
+      return; // Don't check again for 15 seconds after a state change
     }
 
     // Generic check for screen sharing indicators
@@ -203,7 +211,7 @@ class ScreenShareDetector {
 
       this.pendingState = newState;
 
-      // Wait 5 seconds before actually changing state (increased from 3s)
+      // Wait 8 seconds before actually changing state (very conservative)
       this.stateChangeTimer = setTimeout(() => {
         if (newState && !this.isSharing) {
           this.handleScreenShareStart();
@@ -213,16 +221,24 @@ class ScreenShareDetector {
           this.lastStateChange = Date.now();
         }
         this.pendingState = null;
-      }, 5000);
+      }, 8000);
     }
   }
 
   handleScreenShareStart(stream = null) {
     if (this.isSharing) return; // Already sharing
-    
-    console.log('Blur: Screen sharing started');
+
+    // If called with a stream, it came from the hook (most reliable)
+    if (stream) {
+      console.log('Blur: Screen sharing started (detected by getDisplayMedia hook)');
+      this.hookDetectedScreenShare = true;
+      // Once hook detects, disable DOM detection to prevent flicker
+    } else {
+      console.log('Blur: Screen sharing started (detected by DOM fallback)');
+    }
+
     this.isSharing = true;
-    
+
     // Notify background script
     chrome.runtime.sendMessage({
       type: 'SCREEN_SHARE_STARTED',
