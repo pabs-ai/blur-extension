@@ -6,6 +6,7 @@ class ScreenShareDetector {
     this.checkInterval = null;
     this.stateChangeTimer = null;
     this.pendingState = null;
+    this.lastStateChange = null; // Track when last state change occurred
     this.init();
   }
 
@@ -165,6 +166,12 @@ class ScreenShareDetector {
   }
 
   checkDOMForIndicators() {
+    // Prevent state changes if one happened recently (lock for 10 seconds)
+    const now = Date.now();
+    if (this.lastStateChange && (now - this.lastStateChange < 10000)) {
+      return; // Don't check again for 10 seconds after a state change
+    }
+
     // Generic check for screen sharing indicators
     const indicators = [
       // Google Meet
@@ -196,15 +203,17 @@ class ScreenShareDetector {
 
       this.pendingState = newState;
 
-      // Wait 3 seconds before actually changing state
+      // Wait 5 seconds before actually changing state (increased from 3s)
       this.stateChangeTimer = setTimeout(() => {
         if (newState && !this.isSharing) {
           this.handleScreenShareStart();
+          this.lastStateChange = Date.now();
         } else if (!newState && this.isSharing) {
           this.handleScreenShareStop();
+          this.lastStateChange = Date.now();
         }
         this.pendingState = null;
-      }, 3000);
+      }, 5000);
     }
   }
 
