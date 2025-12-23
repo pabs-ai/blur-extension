@@ -1,6 +1,8 @@
 // Popup Script - Controls and settings interface
 
 class PopupController {
+  static SETTINGS_VERSION = '1.0';
+
   constructor() {
     this.state = null;
     this.init();
@@ -231,10 +233,12 @@ class PopupController {
 
   exportSettings() {
     try {
+      const now = new Date();
+
       // Create export data
       const exportData = {
-        version: '1.0',
-        exportedAt: new Date().toISOString(),
+        version: PopupController.SETTINGS_VERSION,
+        exportedAt: now.toISOString(),
         settings: this.state.settings
       };
 
@@ -246,7 +250,7 @@ class PopupController {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `blur-settings-${new Date().toISOString().split('T')[0]}.json`;
+      a.download = `blur-settings-${now.toISOString().split('T')[0]}.json`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -261,7 +265,14 @@ class PopupController {
       }, 2000);
     } catch (error) {
       console.error('Export failed:', error);
-      alert('Failed to export settings. Please try again.');
+      const statusText = document.getElementById('status');
+      const originalText = statusText.textContent;
+      statusText.style.color = '#ef4444';
+      statusText.textContent = 'Failed to export settings. Please try again.';
+      setTimeout(() => {
+        statusText.style.color = '';
+        statusText.textContent = originalText;
+      }, 3000);
     }
   }
 
@@ -279,11 +290,34 @@ class PopupController {
         throw new Error('Invalid settings file format');
       }
 
-      // Validate settings structure
-      const requiredFields = ['blurEnabled', 'blurIntensity', 'dataTypes', 'autoEnable', 'showIndicator'];
-      for (const field of requiredFields) {
-        if (!(field in importData.settings)) {
-          throw new Error(`Missing required field: ${field}`);
+      // Validate settings structure and types
+      const settings = importData.settings;
+
+      if (typeof settings.blurEnabled !== 'boolean') {
+        throw new Error('blurEnabled must be a boolean');
+      }
+      if (typeof settings.blurIntensity !== 'number' || settings.blurIntensity < 0) {
+        throw new Error('blurIntensity must be a positive number');
+      }
+      if (typeof settings.autoEnable !== 'boolean') {
+        throw new Error('autoEnable must be a boolean');
+      }
+      if (typeof settings.showIndicator !== 'boolean') {
+        throw new Error('showIndicator must be a boolean');
+      }
+
+      // Validate dataTypes object and its fields
+      if (!settings.dataTypes || typeof settings.dataTypes !== 'object') {
+        throw new Error('dataTypes must be an object');
+      }
+
+      const requiredDataTypes = ['email', 'creditCard', 'apiKeys', 'revenue', 'accountNumbers', 'pii'];
+      for (const type of requiredDataTypes) {
+        if (!(type in settings.dataTypes)) {
+          throw new Error(`Missing required dataTypes field: ${type}`);
+        }
+        if (typeof settings.dataTypes[type] !== 'boolean') {
+          throw new Error(`dataTypes.${type} must be a boolean`);
         }
       }
 
@@ -305,12 +339,18 @@ class PopupController {
       setTimeout(() => {
         statusText.textContent = originalText;
       }, 2000);
-
-      // Clear file input
-      document.getElementById('import-file').value = '';
     } catch (error) {
       console.error('Import failed:', error);
-      alert(`Failed to import settings: ${error.message}`);
+      const statusText = document.getElementById('status');
+      const originalText = statusText.textContent;
+      statusText.style.color = '#ef4444';
+      statusText.textContent = `Failed to import settings: ${error.message}`;
+      setTimeout(() => {
+        statusText.style.color = '';
+        statusText.textContent = originalText;
+      }, 3000);
+    } finally {
+      // Clear file input
       document.getElementById('import-file').value = '';
     }
   }
