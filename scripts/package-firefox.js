@@ -2,7 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
+const archiver = require('archiver');
 
 console.log('🦊 Packaging Firefox Extension...\n');
 
@@ -115,14 +115,20 @@ fs.writeFileSync(
   JSON.stringify(firefoxManifest, null, 2)
 );
 
-// Copy other files
+// Copy other files using fs.cpSync (cross-platform)
 console.log('📁 Copying files...');
 const filesToCopy = ['src', 'assets'];
 
 filesToCopy.forEach((item) => {
   const src = path.resolve(item);
   const dest = path.join(firefoxDir, item);
-  execSync(`cp -r "${src}" "${dest}"`);
+
+  if (fs.existsSync(src)) {
+    fs.cpSync(src, dest, { recursive: true });
+    console.log(`  ✓ Copied: ${item}`);
+  } else {
+    console.warn(`  ⚠️  Skipping missing: ${item}`);
+  }
 });
 
 // Create Firefox-compatible background.js
@@ -132,27 +138,57 @@ let backgroundContent = fs.readFileSync('src/background.js', 'utf8');
 backgroundContent = backgroundContent.replace(/chrome\.action/g, 'chrome.browserAction');
 fs.writeFileSync(path.join(firefoxDir, 'src', 'background.js'), backgroundContent);
 
-try {
-  // Create package
-  console.log('📦 Creating Firefox package...');
-  execSync(`cd "${firefoxDir}" && zip -r "../blur-extension-firefox.zip" .`, {
-    stdio: 'inherit',
+// Create package using archiver
+async function createZip() {
+  return new Promise((resolve, reject) => {
+    const output = fs.createWriteStream(outputFile);
+    const archive = archiver('zip', {
+      zlib: { level: 9 } // Maximum compression
+    });
+
+    output.on('close', () => {
+      const sizeMB = (archive.pointer() / (1024 * 1024)).toFixed(2);
+      console.log(`\n✅ Firefox package created successfully!`);
+      console.log(`📍 Location: ${outputFile}`);
+      console.log(`📏 Size: ${sizeMB} MB`);
+      console.log(`📦 Total bytes: ${archive.pointer()}`);
+      console.log('\n⚠️  Note: Firefox extension uses Manifest V2');
+      resolve();
+    });
+
+    archive.on('error', (err) => {
+      reject(err);
+    });
+
+    archive.on('warning', (err) => {
+      if (err.code === 'ENOENT') {
+        console.warn('⚠️  Warning:', err.message);
+      } else {
+        reject(err);
+      }
+    });
+
+    archive.pipe(output);
+
+    console.log('📦 Creating Firefox package...');
+
+    // Add all files from firefox-temp directory
+    archive.directory(firefoxDir, false);
+
+    archive.finalize();
   });
-
-  // Clean up temp directory
-  fs.rmSync(firefoxDir, { recursive: true });
-
-  const stats = fs.statSync(outputFile);
-  const sizeMB = (stats.size / (1024 * 1024)).toFixed(2);
-
-  console.log(`\n✅ Firefox package created successfully!`);
-  console.log(`📍 Location: ${outputFile}`);
-  console.log(`📏 Size: ${sizeMB} MB`);
-  console.log('\n⚠️  Note: Firefox extension uses Manifest V2');
-} catch (error) {
-  console.error(`\n❌ Packaging failed: ${error.message}`);
-  if (fs.existsSync(firefoxDir)) {
-    fs.rmSync(firefoxDir, { recursive: true });
-  }
-  process.exit(1);
 }
+
+// Run the packaging
+createZip()
+  .then(() => {
+    // Clean up temp directory
+    fs.rmSync(firefoxDir, { recursive: true });
+  })
+  .catch((error) => {
+    console.error(`\n❌ Packaging failed: ${error.message}`);
+    if (fs.existsSync(firefoxDir)) {
+      fs.rmSync(firefoxDir, { recursive: true });
+    }
+    process.exit(1);
+  });
