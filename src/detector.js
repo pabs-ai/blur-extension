@@ -158,8 +158,7 @@ class ScreenShareDetector {
       // Look for Slack Huddles screen sharing indicators
       // Slack uses huddle UI and screen share controls
       const huddleShareActive = document.querySelector('[data-qa="huddle_screenshare_controls"]');
-      const shareScreenButton = document.querySelector('[aria-label*="Share screen"]');
-      const stopSharingButton = document.querySelector('[aria-label*="Stop sharing"]');
+      const stopSharingButton = document.querySelector('[aria-label*="Stop sharing" i]');
       const huddleShareIndicator = document.querySelector('.p-huddle_screenshare_container');
 
       if (huddleShareActive || stopSharingButton || huddleShareIndicator) {
@@ -173,21 +172,19 @@ class ScreenShareDetector {
       }
     });
 
-    // Wait for body to be available
-    if (document.body) {
+    const startObserver = () => {
       observer.observe(document.body, {
         childList: true,
         subtree: true,
         attributes: true
       });
+    };
+
+    // Wait for body to be available
+    if (document.body) {
+      startObserver();
     } else {
-      document.addEventListener('DOMContentLoaded', () => {
-        observer.observe(document.body, {
-          childList: true,
-          subtree: true,
-          attributes: true
-        });
-      });
+      document.addEventListener('DOMContentLoaded', startObserver);
     }
   }
 
