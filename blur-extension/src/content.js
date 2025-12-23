@@ -67,11 +67,14 @@ class SensitiveDataBlurrer {
       const settingsChanged = JSON.stringify(oldState?.settings) !== JSON.stringify(this.state.settings);
 
       if (sharingChanged || enabledChanged) {
+        console.log('Blur: State changed - sharing:', this.state.isScreenSharing, 'enabled:', this.state.isBlurEnabled);
         this.updateBlurState();
       } else if (settingsChanged && this.state.isScreenSharing && this.state.isBlurEnabled) {
         // Settings changed while blurring - just rescan without stopping
-        console.log('Blur: Settings updated, rescanning');
+        console.log('Blur: Settings updated, rescanning. DataTypes:', this.state.settings?.dataTypes);
         this.debouncedScan();
+      } else {
+        console.log('Blur: STATE_UPDATE received but no action needed');
       }
 
       sendResponse({ success: true });
