@@ -29,20 +29,23 @@ class ScreenShareDetector {
     const hostname = window.location.hostname;
     if (hostname.includes('meet.google.com')) return 'meet';
     if (hostname.includes('zoom.us')) return 'zoom';
+    if (hostname.includes('teams.microsoft.com')) return 'teams';
     return null;
   }
 
   startMonitoring() {
     // Hook into getDisplayMedia API
     this.hookGetDisplayMedia();
-    
+
     // Platform-specific monitoring
     if (this.platform === 'meet') {
       this.monitorGoogleMeet();
     } else if (this.platform === 'zoom') {
       this.monitorZoom();
+    } else if (this.platform === 'teams') {
+      this.monitorTeams();
     }
-    
+
     // Fallback: Check for screen share indicators in DOM
     this.checkInterval = setInterval(() => {
       this.checkDOMForIndicators();
@@ -121,7 +124,7 @@ class ScreenShareDetector {
       // Look for "You are screen sharing" indicator
       const sharingIndicator = document.querySelector('.sharing-indicator-container');
       const stopShareButton = document.querySelector('[aria-label*="Stop Share"]');
-      
+
       if (sharingIndicator || stopShareButton) {
         if (!this.isSharing) {
           this.handleScreenShareStart();
@@ -149,6 +152,46 @@ class ScreenShareDetector {
     }
   }
 
+  monitorTeams() {
+    // Microsoft Teams specific monitoring
+    const observer = new MutationObserver((mutations) => {
+      // Look for Teams screen sharing indicators
+      // Teams uses different selectors depending on the version
+      const sharingIndicator = document.querySelector('[data-tid="screen-sharing-indicator"]');
+      const stopShareButton = document.querySelector('[data-tid="stop-screen-share-button"]');
+      const sharingBanner = document.querySelector('.ts-calling-screen-share-banner');
+      const presentingLabel = document.querySelector('[aria-label*="presenting"]');
+      const stopPresenting = document.querySelector('[aria-label*="Stop presenting"]');
+
+      if (sharingIndicator || stopShareButton || sharingBanner || presentingLabel || stopPresenting) {
+        if (!this.isSharing) {
+          this.handleScreenShareStart();
+        }
+      } else {
+        if (this.isSharing) {
+          this.handleScreenShareStop();
+        }
+      }
+    });
+
+    // Wait for body to be available
+    if (document.body) {
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true
+      });
+    } else {
+      document.addEventListener('DOMContentLoaded', () => {
+        observer.observe(document.body, {
+          childList: true,
+          subtree: true,
+          attributes: true
+        });
+      });
+    }
+  }
+
   checkDOMForIndicators() {
     // Generic check for screen sharing indicators
     const indicators = [
@@ -158,7 +201,12 @@ class ScreenShareDetector {
       // Zoom
       '.sharing-indicator',
       '[aria-label*="Stop Share"]',
-      '[aria-label*="stop sharing"]'
+      '[aria-label*="stop sharing"]',
+      // Microsoft Teams
+      '[data-tid="screen-sharing-indicator"]',
+      '[data-tid="stop-screen-share-button"]',
+      '.ts-calling-screen-share-banner',
+      '[aria-label*="Stop presenting"]'
     ];
 
     const hasIndicator = indicators.some(selector => {
