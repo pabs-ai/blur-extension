@@ -38,9 +38,13 @@ class ScreenShareDetector {
     // Hook into getDisplayMedia API - this is the most reliable method
     this.hookGetDisplayMedia();
 
-    // DISABLE DOM-based detection - it causes flickering due to DOM changes
-    // Only rely on the getDisplayMedia hook which is stable
-    console.log('Blur: Using getDisplayMedia hook only (DOM detection disabled to prevent flickering)');
+    // ENABLE DOM-based detection WITH debouncing - the 3-second debounce prevents flickering
+    // This provides a fallback when the hook doesn't catch the screen share
+    this.checkInterval = setInterval(() => {
+      this.checkDOMForIndicators();
+    }, 2000);  // Check every 2 seconds, state changes are debounced by 3 seconds
+
+    console.log('Blur: Using getDisplayMedia hook + debounced DOM detection (3s delay to prevent flickering)');
   }
 
   hookGetDisplayMedia() {

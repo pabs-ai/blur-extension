@@ -4,6 +4,8 @@ class ScreenShareDetector {
   constructor() {
     this.isSharing = false;
     this.checkInterval = null;
+    this.stateChangeTimer = null;
+    this.pendingState = null;
     this.init();
   }
 
@@ -33,36 +35,37 @@ class ScreenShareDetector {
   }
 
   startMonitoring() {
-    // Hook into getDisplayMedia API
+    // Hook into getDisplayMedia API - this is the most reliable method
     this.hookGetDisplayMedia();
-    
-    // Platform-specific monitoring
-    if (this.platform === 'meet') {
-      this.monitorGoogleMeet();
-    } else if (this.platform === 'zoom') {
-      this.monitorZoom();
-    }
-    
-    // Fallback: Check for screen share indicators in DOM
+
+    // ENABLE DOM-based detection WITH debouncing - the 3-second debounce prevents flickering
+    // This provides a fallback when the hook doesn't catch the screen share
     this.checkInterval = setInterval(() => {
       this.checkDOMForIndicators();
-    }, 1000);
+    }, 2000);  // Check every 2 seconds, state changes are debounced by 3 seconds
+
+    console.log('Blur: Using getDisplayMedia hook + debounced DOM detection (3s delay to prevent flickering)');
   }
 
   hookGetDisplayMedia() {
-    // Hook into the getDisplayMedia API to detect screen sharing
-    const originalGetDisplayMedia = navigator.mediaDevices.getDisplayMedia;
+    // Store original if not already stored
+    if (!this.originalGetDisplayMedia) {
+      this.originalGetDisplayMedia = navigator.mediaDevices.getDisplayMedia.bind(navigator.mediaDevices);
+      console.log('Blur: Stored original getDisplayMedia');
+    }
+
     const detector = this;
 
+    // Replace with our hooked version
     navigator.mediaDevices.getDisplayMedia = async function(...args) {
-      console.log('Blur: getDisplayMedia called');
-      
+      console.log('Blur: getDisplayMedia called - hook working!');
+
       try {
-        const stream = await originalGetDisplayMedia.apply(this, args);
-        
+        const stream = await detector.originalGetDisplayMedia(...args);
+
         // Screen sharing started
         detector.handleScreenShareStart(stream);
-        
+
         // Monitor for when it stops
         stream.getVideoTracks().forEach(track => {
           track.onended = () => {
@@ -70,13 +73,25 @@ class ScreenShareDetector {
             detector.handleScreenShareStop();
           };
         });
-        
+
         return stream;
       } catch (error) {
         console.log('Blur: getDisplayMedia cancelled or failed', error);
         throw error;
       }
     };
+
+    console.log('Blur: Hook applied to getDisplayMedia');
+
+    // Re-apply hook a few times during page load, then stop
+    if (!this.hookAttempts) this.hookAttempts = 0;
+    this.hookAttempts++;
+
+    if (this.hookAttempts < 5) {
+      setTimeout(() => this.hookGetDisplayMedia(), 2000);
+    } else {
+      console.log('Blur: Hook monitoring complete');
+    }
   }
 
   monitorGoogleMeet() {
@@ -165,10 +180,31 @@ class ScreenShareDetector {
       return document.querySelector(selector) !== null;
     });
 
-    if (hasIndicator && !this.isSharing) {
-      this.handleScreenShareStart();
-    } else if (!hasIndicator && this.isSharing) {
-      this.handleScreenShareStop();
+    const newState = hasIndicator;
+
+    // Debounce state changes to prevent flickering
+    if (newState !== this.isSharing) {
+      if (this.pendingState === newState) {
+        // Same pending state, no need to reset timer
+        return;
+      }
+
+      // Clear existing timer
+      if (this.stateChangeTimer) {
+        clearTimeout(this.stateChangeTimer);
+      }
+
+      this.pendingState = newState;
+
+      // Wait 3 seconds before actually changing state
+      this.stateChangeTimer = setTimeout(() => {
+        if (newState && !this.isSharing) {
+          this.handleScreenShareStart();
+        } else if (!newState && this.isSharing) {
+          this.handleScreenShareStop();
+        }
+        this.pendingState = null;
+      }, 3000);
     }
   }
 
