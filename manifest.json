@@ -18,7 +18,8 @@
     "https://*.salesforce.com/*",
     "https://*.lightning.force.com/*",
     "https://meet.google.com/*",
-    "https://*.zoom.us/*"
+    "https://*.zoom.us/*",
+    "https://*.slack.com/*"
   ],
   "background": {
     "service_worker": "src/background.js"
@@ -38,7 +39,8 @@
     {
       "matches": [
         "https://meet.google.com/*",
-        "https://*.zoom.us/*"
+        "https://*.zoom.us/*",
+        "https://*.slack.com/*"
       ],
       "js": ["src/detector.js"],
       "run_at": "document_start"

@@ -29,20 +29,23 @@ class ScreenShareDetector {
     const hostname = window.location.hostname;
     if (hostname.includes('meet.google.com')) return 'meet';
     if (hostname.includes('zoom.us')) return 'zoom';
+    if (hostname.includes('slack.com')) return 'slack';
     return null;
   }
 
   startMonitoring() {
     // Hook into getDisplayMedia API
     this.hookGetDisplayMedia();
-    
+
     // Platform-specific monitoring
     if (this.platform === 'meet') {
       this.monitorGoogleMeet();
     } else if (this.platform === 'zoom') {
       this.monitorZoom();
+    } else if (this.platform === 'slack') {
+      this.monitorSlack();
     }
-    
+
     // Fallback: Check for screen share indicators in DOM
     this.checkInterval = setInterval(() => {
       this.checkDOMForIndicators();
@@ -121,7 +124,7 @@ class ScreenShareDetector {
       // Look for "You are screen sharing" indicator
       const sharingIndicator = document.querySelector('.sharing-indicator-container');
       const stopShareButton = document.querySelector('[aria-label*="Stop Share"]');
-      
+
       if (sharingIndicator || stopShareButton) {
         if (!this.isSharing) {
           this.handleScreenShareStart();
@@ -149,6 +152,45 @@ class ScreenShareDetector {
     }
   }
 
+  monitorSlack() {
+    // Slack Huddles specific monitoring
+    const observer = new MutationObserver((mutations) => {
+      // Look for Slack Huddles screen sharing indicators
+      // Slack uses huddle UI and screen share controls
+      const huddleShareActive = document.querySelector('[data-qa="huddle_screenshare_controls"]');
+      const shareScreenButton = document.querySelector('[aria-label*="Share screen"]');
+      const stopSharingButton = document.querySelector('[aria-label*="Stop sharing"]');
+      const huddleShareIndicator = document.querySelector('.p-huddle_screenshare_container');
+
+      if (huddleShareActive || stopSharingButton || huddleShareIndicator) {
+        if (!this.isSharing) {
+          this.handleScreenShareStart();
+        }
+      } else {
+        if (this.isSharing) {
+          this.handleScreenShareStop();
+        }
+      }
+    });
+
+    // Wait for body to be available
+    if (document.body) {
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true
+      });
+    } else {
+      document.addEventListener('DOMContentLoaded', () => {
+        observer.observe(document.body, {
+          childList: true,
+          subtree: true,
+          attributes: true
+        });
+      });
+    }
+  }
+
   checkDOMForIndicators() {
     // Generic check for screen sharing indicators
     const indicators = [
@@ -158,7 +200,11 @@ class ScreenShareDetector {
       // Zoom
       '.sharing-indicator',
       '[aria-label*="Stop Share"]',
-      '[aria-label*="stop sharing"]'
+      '[aria-label*="stop sharing"]',
+      // Slack Huddles
+      '[data-qa="huddle_screenshare_controls"]',
+      '.p-huddle_screenshare_container',
+      '[aria-label*="Stop sharing"]'
     ];
 
     const hasIndicator = indicators.some(selector => {
