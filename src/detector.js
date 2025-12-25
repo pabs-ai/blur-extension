@@ -37,7 +37,10 @@ class ScreenShareDetector {
     // Hook into getDisplayMedia API
     this.hookGetDisplayMedia();
 
-    // Platform-specific monitoring
+    // Platform-specific monitoring - DISABLED to fix flickering (see commit 3cd4275)
+    // DOM-based detection causes false positives during DevTools reflow and page mutations
+    // The getDisplayMedia API hook above is sufficient for all modern screen sharing
+    /*
     if (this.platform === 'meet') {
       this.monitorGoogleMeet();
     } else if (this.platform === 'zoom') {
@@ -50,6 +53,7 @@ class ScreenShareDetector {
     this.checkInterval = setInterval(() => {
       this.checkDOMForIndicators();
     }, 1000);
+    */
   }
 
   hookGetDisplayMedia() {
