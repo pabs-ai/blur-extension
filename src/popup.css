@@ -299,6 +299,16 @@ body {
 }
 
 /* Buttons */
+.button-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.button-group .secondary-button {
+  width: 100%;
+}
+
 .secondary-button {
   width: 100%;
   padding: 10px 16px;
