@@ -280,7 +280,7 @@ class SensitiveDataBlurrer {
 
   containsSensitiveData(text, dataTypes) {
     if (!text || text.length < 3) return false;
-    
+
     const patterns = {
       email: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/,
       creditCard: /\b(?:\d{4}[-\s]?){3}\d{4}\b/,
@@ -290,13 +290,30 @@ class SensitiveDataBlurrer {
       ssn: /\b\d{3}-\d{2}-\d{4}\b/,
       phone: /\b(?:\+1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/
     };
-    
+
+    // Check built-in patterns
     for (const [type, pattern] of Object.entries(patterns)) {
       if (dataTypes[type] !== false && pattern.test(text)) {
         return true;
       }
     }
-    
+
+    // Check custom patterns
+    if (this.state.settings.customPatterns && this.state.settings.customPatterns.length > 0) {
+      for (const customPattern of this.state.settings.customPatterns) {
+        if (customPattern.enabled !== false) {
+          try {
+            const regex = new RegExp(customPattern.regex);
+            if (regex.test(text)) {
+              return true;
+            }
+          } catch (error) {
+            console.warn('Blur: Invalid custom pattern:', customPattern.name, error);
+          }
+        }
+      }
+    }
+
     return false;
   }
 
