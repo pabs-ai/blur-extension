@@ -1,6 +1,14 @@
 // Screen Share Detector - Monitors conferencing apps for active screen sharing
 
 class ScreenShareDetector {
+  static TEAMS_SELECTORS = [
+    '[data-tid="screen-sharing-indicator"]',
+    '[data-tid="stop-screen-share-button"]',
+    '.ts-calling-screen-share-banner',
+    '[aria-label*="presenting"]',
+    '[aria-label*="Stop presenting"]'
+  ];
+
   constructor() {
     this.isSharing = false;
     this.checkInterval = null;
@@ -29,6 +37,7 @@ class ScreenShareDetector {
     const hostname = window.location.hostname;
     if (hostname.includes('meet.google.com')) return 'meet';
     if (hostname.includes('zoom.us')) return 'zoom';
+    if (hostname.includes('teams.microsoft.com')) return 'teams';
     if (hostname.includes('slack.com')) return 'slack';
     return null;
   }
@@ -37,6 +46,7 @@ class ScreenShareDetector {
     // Hook into getDisplayMedia API
     this.hookGetDisplayMedia();
 
+    // Platform-specific monitoring
     // Platform-specific monitoring - DISABLED to fix flickering (see commit 3cd4275)
     // DOM-based detection causes false positives during DevTools reflow and page mutations
     // The getDisplayMedia API hook above is sufficient for all modern screen sharing
@@ -45,6 +55,8 @@ class ScreenShareDetector {
       this.monitorGoogleMeet();
     } else if (this.platform === 'zoom') {
       this.monitorZoom();
+    } else if (this.platform === 'teams') {
+      this.monitorTeams();
     } else if (this.platform === 'slack') {
       this.monitorSlack();
     }
@@ -156,6 +168,21 @@ class ScreenShareDetector {
     }
   }
 
+  monitorTeams() {
+    // Microsoft Teams specific monitoring
+    const combinedSelector = ScreenShareDetector.TEAMS_SELECTORS.join(',');
+
+    const observer = new MutationObserver(() => {
+      const isCurrentlySharing = document.querySelector(combinedSelector) !== null;
+
+      if (isCurrentlySharing && !this.isSharing) {
+        this.handleScreenShareStart();
+      } else if (!isCurrentlySharing && this.isSharing) {
+        this.handleScreenShareStop();
+      }
+    });
+
+    const observeBody = () => {
   monitorSlack() {
     // Slack Huddles specific monitoring
     const observer = new MutationObserver((mutations) => {
@@ -184,6 +211,10 @@ class ScreenShareDetector {
       });
     };
 
+    if (document.body) {
+      observeBody();
+    } else {
+      document.addEventListener('DOMContentLoaded', observeBody);
     // Wait for body to be available
     if (document.body) {
       startObserver();
@@ -202,6 +233,8 @@ class ScreenShareDetector {
       '.sharing-indicator',
       '[aria-label*="Stop Share"]',
       '[aria-label*="stop sharing"]',
+      // Microsoft Teams
+      ...ScreenShareDetector.TEAMS_SELECTORS
       // Slack Huddles
       '[data-qa="huddle_screenshare_controls"]',
       '.p-huddle_screenshare_container',

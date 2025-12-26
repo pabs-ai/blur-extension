@@ -19,6 +19,7 @@
     "https://*.lightning.force.com/*",
     "https://meet.google.com/*",
     "https://*.zoom.us/*",
+    "https://teams.microsoft.com/*"
     "https://*.slack.com/*"
   ],
   "background": {
@@ -40,6 +41,7 @@
       "matches": [
         "https://meet.google.com/*",
         "https://*.zoom.us/*",
+        "https://teams.microsoft.com/*"
         "https://*.slack.com/*"
       ],
       "js": ["src/detector.js"],
