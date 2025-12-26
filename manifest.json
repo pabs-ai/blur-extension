@@ -20,6 +20,7 @@
     "https://meet.google.com/*",
     "https://*.zoom.us/*",
     "https://teams.microsoft.com/*"
+    "https://*.slack.com/*"
   ],
   "background": {
     "service_worker": "src/background.js"
@@ -41,6 +42,7 @@
         "https://meet.google.com/*",
         "https://*.zoom.us/*",
         "https://teams.microsoft.com/*"
+        "https://*.slack.com/*"
       ],
       "js": ["src/detector.js"],
       "run_at": "document_start"

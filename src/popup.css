@@ -299,6 +299,16 @@ body {
 }
 
 /* Buttons */
+.button-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.button-group .secondary-button {
+  width: 100%;
+}
+
 .secondary-button {
   width: 100%;
   padding: 10px 16px;
@@ -319,6 +329,72 @@ body {
 
 .secondary-button:active {
   transform: scale(0.98);
+}
+
+/* Custom Patterns */
+.custom-patterns-list {
+  margin-bottom: 12px;
+}
+
+.pattern-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  gap: 8px;
+}
+
+.pattern-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.pattern-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 2px;
+}
+
+.pattern-regex {
+  font-size: 11px;
+  font-family: 'Courier New', monospace;
+  color: #6b7280;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pattern-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.pattern-btn {
+  padding: 4px 8px;
+  background: transparent;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pattern-btn:hover {
+  background: #e5e7eb;
+}
+
+.pattern-btn.delete {
+  color: #dc2626;
+  border-color: #fecaca;
+}
+
+.pattern-btn.delete:hover {
+  background: #fee2e2;
 }
 
 /* Footer */

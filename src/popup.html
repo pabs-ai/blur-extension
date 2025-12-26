@@ -111,6 +111,14 @@
       <button class="secondary-button" id="add-site">+ Add Custom Site</button>
     </div>
 
+    <!-- Custom Patterns -->
+    <div class="section">
+      <h3>Custom Patterns</h3>
+      <p class="description">Add regex patterns to detect custom sensitive data</p>
+      <div id="custom-patterns-list" class="custom-patterns-list"></div>
+      <button class="secondary-button" id="add-pattern">+ Add Custom Pattern</button>
+    </div>
+
     <!-- Options -->
     <div class="section">
       <label class="checkbox-label">
@@ -121,6 +129,16 @@
         <input type="checkbox" id="show-indicator" checked>
         <span>Show on-screen indicator when active</span>
       </label>
+    </div>
+
+    <!-- Export/Import -->
+    <div class="section">
+      <h3>Backup & Restore</h3>
+      <div class="button-group">
+        <button class="secondary-button" id="export-settings">Export Settings</button>
+        <button class="secondary-button" id="import-settings">Import Settings</button>
+      </div>
+      <input type="file" id="import-file" accept=".json" class="hidden">
     </div>
 
     <!-- Footer -->
